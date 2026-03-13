@@ -1,0 +1,3 @@
+# Add outputs for resources which you need to know details about following creation
+# such as KMS key IDs, RDS instance IDs, Endpoint IDs etc....
+
