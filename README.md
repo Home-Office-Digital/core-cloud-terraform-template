@@ -24,28 +24,28 @@ Once your repository is created, perform the following setup steps:
 
 
 2. **Add TF specific files**  
-   Update the existing **main.tf**, **outputs.tf**, **providers.tf** and **variables.tf** for your project.
-   Replace **env-a**, **env-b** and **env-c** with your existing environments and add the required values
-   If using child modules within this repo, replace **modules/module1** and **modules/module2** with the required code
-   Create your TF tests for your given service, remember to replace **module1** and **module2** in **.github/workflows/terraform-tests.yaml**
+   - Update the existing **main.tf**, **outputs.tf**, **providers.tf** and **variables.tf** for your project.  
+   - Replace **env-a**, **env-b** and **env-c** with your existing environments and add the required values.
+   - If using child modules within this repo, replace **modules/module1** and **modules/module2** with the required code.  
+   - Create your TF tests for your given service, remember to replace **module1** and **module2** in **.github/workflows/terraform-tests.yaml**
 
 
 3. **Update `tf-validate yaml file`** 
-   Replace <GITHUB_ENVIRONMENT_NAME> with value for Environment
-   Replace <TF_STATE_S3_BUCKET> with Terraform State S3 bucket name
-   Replace <TF_STATE_KEY> with required subfolder in TF State Bucket i.e. github/terraform.state
-   Replace <IAM_ROLE_TO_CREATE_RESOURCES> with required IAM role name which performs the TF Apply
-   Repace <ENV> with ENV Short name used in Repo Secrets i.e. LIVE_ACCOUNT_ID
+   - Replace <GITHUB_ENVIRONMENT_NAME> with value for Environment. 
+   - Replace <TF_STATE_S3_BUCKET> with Terraform State S3 bucket name. 
+   - Replace <TF_STATE_KEY> with required subfolder in TF State Bucket i.e. github/terraform.state.
+   - Replace <IAM_ROLE_TO_CREATE_RESOURCES> with required IAM role name which performs the TF Apply
+   - Replace <ENV> with ENV Short name used in Repo Secrets i.e. LIVE_ACCOUNT_ID.
 
 4. **Update `deploy-resources yaml file`** 
-   Replace **env-a**, **env-b** and **env-c** for **github-environment** with appropriate value for Environment
-   Replace <TF_STATE_DYNAMODB_TABLE> with Terraform State DynamoDB table
-   Replace <IAM_ROLE_TO_CREATE_RESOURCES> with required IAM role name which performs the TF Apply
-   Replace **service-name** with appropriate service-name that is being deployed
-   Enable deployments on push for feature branches, uncomment out lines 4,5 and 6
+   - Replace **env-a**, **env-b** and **env-c** for **github-environment** with appropriate value for Environment. 
+   - Replace <TF_STATE_DYNAMODB_TABLE> with Terraform State DynamoDB table. 
+   - Replace <IAM_ROLE_TO_CREATE_RESOURCES> with required IAM role name which performs the TF Apply. 
+   - Replace **service-name** with appropriate service-name that is being deployed. 
+   - Enable deployments on push for feature branches, uncomment out lines 4,5 and 6. 
 
 5. **Review `CODEOWNERS`**  
-   Update the `CODEOWNERS` file to reflect the correct team members responsible for this repository.
+   - Update the `CODEOWNERS` file to reflect the correct team members responsible for this repository.
 
 6. **Set Repository Settings**  
    Configure these settings under **Settings > Branches**:
