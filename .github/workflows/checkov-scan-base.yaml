@@ -1,0 +1,18 @@
+# This workflow is for scanning your Terraform Plan file/s and Source Code with Checkov
+# Environment variables are currently used instead of a Checkov config file as all options are available and it saves having to add additional steps for checking out the repo with a token.
+# https://github.com/bridgecrewio/checkov-action/blob/master/action.yml
+
+name: Checkov Reusable Scan
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  id-token: write
+  actions: read
+  security-events: write
+
+jobs:
+  checkov-scan:
+    uses: Home-Office-Digital/core-cloud-workflow-checkov-sast-scan/.github/workflows/checkov-scan-base.yaml@1.12.0

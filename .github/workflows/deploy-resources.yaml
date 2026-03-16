@@ -1,0 +1,41 @@
+name: Apply Terraform Configuration
+
+on:
+  #push:
+  #  branches:
+  #    - feature/**
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  deploy-pre-reqs:
+    name: Deploy to ${{ matrix.github-environment }}
+    strategy:
+      fail-fast: false 
+      matrix:
+        include:
+          - github-environment: env-a
+            role-to-assume: '<IAM_ROLE_TO_CREATE_RESOURCES>'
+          - github-environment: env-b
+            role-to-assume: '<IAM_ROLE_TO_CREATE_RESOURCES>'
+          - github-environment: env-c
+            role-to-assume: '<IAM_ROLE_TO_CREATE_RESOURCES>'          
+            
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+
+    uses: Home-Office-Digital/core-cloud-workflow-terraform-actions/.github/workflows/standard-pipeline.yml@main
+    with:
+      apply-branch: '<branch-name>'
+      github-environment: ${{ matrix.github-environment }}
+      state-bucket: 'core-cloud-${{ matrix.github-environment }}-deploy-<service-name>'
+      state-dynamodb-table: '<TF_STATE_DYNAMODB_TABLE>'
+      role-to-assume: ${{ matrix.role-to-assume }}
+      terraform-version: '>= 1.9.3'
+      tfvars-file: 'environments/${{ matrix.github-environment }}/terraform.tfvars'
+      working-directory: 'terraform'
+    secrets:
+      account_id: ${{ secrets.ACCOUNT_ID }}

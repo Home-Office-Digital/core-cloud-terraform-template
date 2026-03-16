@@ -1,0 +1,22 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "(GHA)"
+    reviewers:
+      - "Home-Office-Digital/<team_name>"
+    labels:
+      - "dependencies"
+  - package-ecosystem: "terraform"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "(TF)"
+    reviewers:
+      - "Home-Office-Digital/<team_name"
+    labels:
+      - "dependencies"
