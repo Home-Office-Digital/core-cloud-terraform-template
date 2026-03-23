@@ -1,0 +1,62 @@
+name: Validate Terraform
+on:
+  pull_request:
+    branches:
+      - main
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+jobs:
+  validate:
+    name: Validate Terraform
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Terraform Init
+        id: init
+        uses: Home-Office-Digital/core-cloud-workflow-terraform-actions/actions/init@main
+        with:
+          working-directory: '.'
+          github-environment: '<GITHUB_ENVIRONMENT_NAME>'
+          state-bucket: '<TF_STATE_S3_BUCKET>'
+          state-key: '<TF_STATE_KEY_LOCATION>/terraform.tfstate'
+          role-to-assume: '<IAM_ROLE_TO_CREATE_RESOURCES>'
+          account_id: ${{ secrets.<ENV>_ACCOUNT_ID }}
+      - name: Terraform Fmt
+        id: fmt
+        uses: Home-Office-Digital/core-cloud-workflow-terraform-actions/actions/fmt@main
+        with:
+          working-directory: ${{ inputs.working-directory }}
+      - name: Terraform Validate
+        id: validate
+        if: success() || failure()
+        uses: Home-Office-Digital/core-cloud-workflow-terraform-actions/actions/validate@main
+        with:
+          working-directory: '.'
+        env:
+          GITHUB_OWNER: ukhomeoffice
+          GITHUB_APP_ID: ${{ secrets.GH_APP_ID }}
+          GITHUB_APP_INSTALLATION_ID: ${{ secrets.GH_APP_INSTALLATION_ID }}
+          GITHUB_APP_PEM_FILE: ${{ secrets.GH_APP_PEM_FILE }}
+      - name: TFLint
+        id: lint
+        if: success() || failure()
+        uses: Home-Office-Digital/core-cloud-workflow-tflint-scan@main
+      - name: Terraform Plan
+        id: plan
+        uses: Home-Office-Digital/core-cloud-workflow-terraform-actions/actions/plan@main
+        env:
+          GITHUB_OWNER: ukhomeoffice
+          GITHUB_APP_ID: ${{ secrets.GH_APP_ID }}
+          GITHUB_APP_INSTALLATION_ID: ${{ secrets.GH_APP_INSTALLATION_ID }}
+          GITHUB_APP_PEM_FILE: ${{ secrets.GH_APP_PEM_FILE }}
+        with:
+          account_id: ${{ secrets.<ENV>_ACCOUNT_ID }}
+          github-environment: '<GITHUB_ENVIRONMENT_NAME>'
+          role-to-assume: '<IAM_ROLE_TO_CREATE_RESOURCES>'
