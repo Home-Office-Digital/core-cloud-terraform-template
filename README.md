@@ -68,6 +68,15 @@ This template supports two creation modes through `terraform/secrets-manager.tf`
 
 The input is `managed_secrets`, which defaults to an empty map so nothing is created unless you opt in.
 
+If you use this template, add the `random` provider to your Terraform `required_providers` block because `terraform/secrets-manager.tf` uses `random_password`:
+
+```hcl
+random = {
+  source  = "hashicorp/random"
+  version = "3.4.3"
+}
+```
+
 3. Add secret definitions to your environment tfvars
 
 Copy the example in `terraform/secrets-manager.example.tfvars` into the environment file you want to deploy, then tailor it for that environment.
