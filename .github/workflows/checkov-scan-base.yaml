@@ -15,4 +15,5 @@ permissions:
 
 jobs:
   checkov-scan:
-    uses: Home-Office-Digital/core-cloud-workflow-checkov-sast-scan/.github/workflows/checkov-scan-base.yaml@1.12.0
+    # 2.0.0
+    uses: Home-Office-Digital/core-cloud-workflow-checkov-sast-scan/.github/workflows/checkov-scan-base.yaml@597f4115b0ca0e6c1c3015782b86089bdd68a377
