@@ -53,6 +53,88 @@ Once your repository is created, perform the following setup steps:
    - Configure required reviewers - this is also defined at the org level as a ruleset.
    - Set merge policies (e.g., allow squash merges only)
 
+## 🔐 Managing Secrets with AWS Secrets Manager
+
+AWS Secrets Manager support is added by defining the secret resources in Terraform and then supplying the right values in your environment tfvars.
+
+1. Ensure `<IAM_ROLE_TO_CREATE_RESOURCES>` has the relevant permissions to create/update/delete secrets.
+
+2. Choose how each secret should be created
+
+This template supports two creation modes through `terraform/secrets-manager.tf`:
+
+- **Empty shell**: creates the Secrets Manager secret only, leaving the value to be added manually after deployment
+- **Dynamically Generated**: creates the secret and writes a generated password into the current version using `random_password`
+
+The input is `managed_secrets`, which defaults to an empty map so nothing is created unless you opt in.
+
+If you use this template, add the `random` provider to your Terraform `required_providers` block because `terraform/secrets-manager.tf` uses `random_password`:
+
+```hcl
+random = {
+  source  = "hashicorp/random"
+  version = "3.4.3"
+}
+```
+
+3. Add secret definitions to your environment tfvars
+
+Copy the example in `terraform/secrets-manager.example.tfvars` into the environment file you want to deploy, then tailor it for that environment.
+
+Example:
+
+```hcl
+managed_secrets = {
+  empty_shell = {
+    description = "Create the container only; populate the value manually later."
+    mode        = "empty"
+  }
+
+  generated_database_admin = {
+    mode        = "generated"
+    secret_name = "my-service/live/database-admin"
+    secret_string_template = {
+      username = "dbadmin"
+      engine   = "postgres"
+    }
+  }
+}
+```
+
+For generated secrets, the template stores a JSON payload built from `secret_string_template` plus a generated `password` key.
+
+4. Retrieve existing secrets for reuse
+
+Use `existing_secret_names` to look up secrets that already exist in the target AWS account. The stack exposes:
+
+- `data.aws_secretsmanager_secret.existing`
+- `data.aws_secretsmanager_secret_version.existing`
+- `local.existing_secret_strings`
+- `local.existing_secret_json`
+
+That lets you inject an existing secret into other resources without hard-coding credentials in Terraform.
+
+Example:
+
+```hcl
+existing_secret_names = [
+  "hello-world-app"
+]
+
+example_rds_secret_name = "hello-world-app"
+```
+
+If the secret value is JSON such as:
+
+```json
+{
+  "username": "app_user",
+  "password": "super-secret-value"
+}
+```
+
+then `local.existing_secret_json["hello-world-app"]` gives you a decoded map that can be passed into resources like `aws_db_instance`.
+
 ## 🤝 Contribution Workflow
 
 ### Pull Requests
