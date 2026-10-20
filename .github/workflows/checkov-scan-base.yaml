@@ -6,6 +6,12 @@ name: Checkov Reusable Scan
 
 on:
   workflow_call:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -15,5 +21,4 @@ permissions:
 
 jobs:
   checkov-scan:
-    # 2.0.0
-    uses: Home-Office-Digital/core-cloud-workflow-checkov-sast-scan/.github/workflows/checkov-scan-base.yaml@597f4115b0ca0e6c1c3015782b86089bdd68a377
+    uses: Home-Office-Digital/core-cloud-workflow-checkov-sast-scan/.github/workflows/checkov-scan-base.yaml@121fa86c79521d82b4f92237493584f44d6d8143 #1.21.0
