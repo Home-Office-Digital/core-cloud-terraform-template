@@ -7,16 +7,17 @@ updates:
     commit-message:
       prefix: "(GHA)"
     reviewers:
-      - "Home-Office-Digital/<team_name>"
+      - "Home-Office-Digital/<team-name>"
     labels:
       - "dependencies"
+  # One entry per component: Dependabot reads providers from this directory.
   - package-ecosystem: "terraform"
-    directory: "/"
+    directory: "/source/terraform/components/<component-name>"
     schedule:
       interval: "daily"
     commit-message:
       prefix: "(TF)"
     reviewers:
-      - "Home-Office-Digital/<team_name"
+      - "Home-Office-Digital/<team-name>"
     labels:
       - "dependencies"
