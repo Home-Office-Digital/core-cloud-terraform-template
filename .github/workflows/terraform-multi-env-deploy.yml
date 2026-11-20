@@ -1,0 +1,76 @@
+name: Terraform Deploy
+
+# Plans and applies source/terraform for one environment, with an approval gate
+# before apply. A merge to main deploys dev, a published pre-release deploys
+# test, and a stable release deploys prod. Dispatch it by hand for a rollback,
+# a hotfix, a narrower deploy, a plan-only run, or an ephemeral per-PR deploy.
+# See the Terraform section of the Core Cloud deployment patterns guide.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "source/terraform/**"
+  release:
+    types: [published, released]
+  # checkov:skip=CKV_GHA_7: a deploy, not an artifact build; the inputs are the deploy's entry point, not build-output taint
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        options: [dev, test, prod]
+      version:
+        description: "Git ref to deploy. Blank deploys the branch selected above"
+        required: false
+        type: string
+        default: ""
+      component:
+        description: "'all', one name, or a comma list"
+        required: false
+        type: string
+        default: all
+      deployment:
+        description: "'all', one name, or a comma list"
+        required: false
+        type: string
+        default: all
+      ephemeral:
+        description: "Throwaway per-PR workspace (dev only, needs an open PR)"
+        required: false
+        type: boolean
+        default: false
+      plan-only:
+        description: "Plan only, no apply or gate"
+        required: false
+        type: boolean
+        default: false
+
+run-name: >-
+  Terraform Deploy (${{ github.event_name }}:
+  ${{ github.event_name == 'release' && github.event.release.tag_name || github.ref_name }})
+
+# Least privilege for every other job; the deploy job widens only what it needs.
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    permissions:
+      id-token: write       # OIDC role assumption in the reusable workflow
+      contents: read        # checkout
+      actions: read         # preflight reads the target environment's protection rules
+      pull-requests: read   # preflight looks up the branch's open PR (ephemeral)
+    uses: Home-Office-Digital/core-cloud-workflow-terraform-actions/.github/workflows/terraform-multi-env-deploy.yml@1.3.0
+    with:
+      component: ${{ inputs.component }}
+      deployment: ${{ inputs.deployment }}
+      environment: ${{ inputs.environment }}
+      # Blank falls back to the ref the run was dispatched from.
+      version: ${{ inputs.version != '' && inputs.version || github.ref_name }}
+      # inputs.* is empty on push and release, so give the booleans a value.
+      ephemeral: ${{ inputs.ephemeral || false }}
+      plan-only: ${{ inputs.plan-only || false }}
+      # Exact version: plan and apply each install Terraform, and a range could
+      # resolve to a newer release while apply waits at the gate.
+      terraform-version: "1.17.2"

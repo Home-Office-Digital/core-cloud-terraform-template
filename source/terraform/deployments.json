@@ -1,0 +1,20 @@
+{
+  "<component-name>/dev/<deployment-name>": {
+    "account_id": "<dev-account-id>",
+    "plan_role_name": "<plan-role-name>",
+    "apply_role_name": "<apply-role-name>",
+    "state_bucket_name": "<dev-state-bucket-name>"
+  },
+  "<component-name>/test/<deployment-name>": {
+    "account_id": "<test-account-id>",
+    "plan_role_name": "<plan-role-name>",
+    "apply_role_name": "<apply-role-name>",
+    "state_bucket_name": "<test-state-bucket-name>"
+  },
+  "<component-name>/prod/<deployment-name>": {
+    "account_id": "<prod-account-id>",
+    "plan_role_name": "<plan-role-name>",
+    "apply_role_name": "<apply-role-name>",
+    "state_bucket_name": "<prod-state-bucket-name>"
+  }
+}

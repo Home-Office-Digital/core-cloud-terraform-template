@@ -1,7 +1,8 @@
 .DS_Store
-terraform/.terraform/
-terraform/.terraform/providers/
-.terraform
-.terraform.lock.hcl
-.terrform/
-./terrform.lock.hcl
+
+# Terraform working directories and local state. Commit .terraform.lock.hcl.
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
