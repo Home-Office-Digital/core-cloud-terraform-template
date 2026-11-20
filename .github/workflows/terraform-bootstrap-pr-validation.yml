@@ -1,0 +1,23 @@
+name: Terraform Bootstrap PR Validation
+# Lints, tests, validates and plans source/terraform-bootstrap against the
+# development account's state on a pull request. Uses the bootstrap plan role
+# and never applies.
+on:
+  pull_request:
+    paths:
+      - "source/terraform-bootstrap/**"
+permissions:
+  contents: read
+jobs:
+  validate:
+    # Skips only in the template repository itself, which has no AWS accounts.
+    if: github.repository != 'Home-Office-Digital/core-cloud-terraform-template'
+    permissions:
+      id-token: write       # OIDC role assumption for the plan role
+      contents: read        # checkout
+      pull-requests: read
+    uses: Home-Office-Digital/core-cloud-workflow-terraform-actions/.github/workflows/terraform-pr-validation.yml@1.4.0
+    with:
+      terraform-dir: source/terraform-bootstrap
+      environment: development  # whose state the PR plans against
+      terraform-version: "1.17.2"

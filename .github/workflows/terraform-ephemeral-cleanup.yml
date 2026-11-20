@@ -1,0 +1,38 @@
+name: Terraform Ephemeral Cleanup
+
+# Destroys the pr-<n>-<deployment> workspaces that ephemeral deploys create.
+#   scope=all     every workspace whose PR is closed or merged (the schedule)
+#   scope=pr-<n>  one PR's workspaces, in any state
+# Delete this file if you don't use ephemeral deploys.
+on:
+  schedule:
+    - cron: "0 3 * * 6"   # Saturdays 03:00 UTC
+  # checkov:skip=CKV_GHA_7: a teardown, not an artifact build; scope selects what to destroy, not build-output taint
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: "'all' (closed/merged PRs) or 'pr-<n>' (one PR, any state)"
+        required: false
+        type: string
+        default: all
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup:
+    # Skips only in the template repository itself, which has no AWS accounts.
+    if: github.repository != 'Home-Office-Digital/core-cloud-terraform-template'
+    permissions:
+      id-token: write       # OIDC role assumption per workspace
+      contents: read        # checkout
+      pull-requests: read   # discover reads each workspace's PR state
+    uses: Home-Office-Digital/core-cloud-workflow-terraform-actions/.github/workflows/terraform-ephemeral-cleanup.yml@1.4.0
+    with:
+      # The schedule has no inputs, so fall back to all.
+      scope: ${{ inputs.scope || 'all' }}
+      # Where ephemeral deploys run. Must match development-environment in
+      # Terraform Deploy, or cleanup looks in the wrong place.
+      environment: development
+      development-environment: development
+      terraform-version: "1.17.2"
