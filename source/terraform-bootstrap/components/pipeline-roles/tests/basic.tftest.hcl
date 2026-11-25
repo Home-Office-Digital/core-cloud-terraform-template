@@ -115,9 +115,32 @@ run "plan_role_is_read_only" {
     condition = alltrue(flatten([
       for s in data.aws_iam_policy_document.plan.statement : [
         for a in s.actions : can(regex("^[a-z0-9-]+:(Get|List|Describe)", a))
-      ] if s.effect != "Deny" && s.sid != "LockState"
+      ] if s.effect != "Deny" && !contains(["LockState", "CreateEphemeralState"], s.sid)
     ]))
-    error_message = "plan-policy.tf may only allow Get*, List* and Describe* actions, apart from LockState. Put write actions in apply-policy.tf."
+    error_message = "plan-policy.tf may only allow Get*, List* and Describe* actions, apart from LockState and CreateEphemeralState. Put write actions in apply-policy.tf."
+  }
+
+  assert {
+    condition     = length([for s in data.aws_iam_policy_document.plan.statement : s if s.sid == "CreateEphemeralState"]) == 0
+    error_message = "Outside the ephemeral environment, the plan role must not write state."
+  }
+}
+
+run "plan_role_creates_only_ephemeral_state" {
+  command = plan
+
+  variables {
+    environment               = "development"
+    apply_from_default_branch = true
+  }
+
+  assert {
+    condition = one([
+      for s in data.aws_iam_policy_document.plan.statement : s if s.sid == "CreateEphemeralState"
+      ]).actions == toset(["s3:PutObject"]) && one([
+      for s in data.aws_iam_policy_document.plan.statement : s if s.sid == "CreateEphemeralState"
+    ]).resources == toset(["arn:aws:s3:::example-tfstate/env:example-repo/*"])
+    error_message = "CreateEphemeralState must allow only s3:PutObject on this repo's ephemeral state."
   }
 }
 

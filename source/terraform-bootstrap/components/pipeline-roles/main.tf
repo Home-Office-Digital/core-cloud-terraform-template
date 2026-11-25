@@ -12,7 +12,8 @@ locals {
   # ephemeral ones. This folder's state also sits under <repo>/, so it's
   # denied explicitly: the roles must not be able to edit their own grants.
   state_bucket_arn = "arn:aws:s3:::${var.state_bucket_name}"
-  state            = ["${local.state_bucket_arn}/${local.repo_name}/*", "${local.state_bucket_arn}/env:${local.repo_name}/*"]
+  state            = ["${local.state_bucket_arn}/${local.repo_name}/*", local.ephemeral_state]
+  ephemeral_state  = "${local.state_bucket_arn}/env:${local.repo_name}/*"
   state_locks      = [for arn in local.state : "${arn}.tflock"]
   own_state        = ["${local.state_bucket_arn}/${local.repo_name}/source/terraform-bootstrap/*"]
 

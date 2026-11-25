@@ -17,6 +17,17 @@ data "aws_iam_policy_document" "plan" {
     resources = local.state_locks
   }
 
+  # Init creates each PR's workspace by writing an empty state object, and runs
+  # as this role. Real state stays read-only.
+  dynamic "statement" {
+    for_each = var.apply_from_default_branch ? [1] : []
+    content {
+      sid       = "CreateEphemeralState"
+      actions   = ["s3:PutObject"]
+      resources = [local.ephemeral_state]
+    }
+  }
+
   statement {
     sid       = "DenyOwnState"
     effect    = "Deny"

@@ -55,7 +55,7 @@ variable "github_repository" {
 }
 
 variable "apply_from_default_branch" {
-  description = "Also let the default branch assume the apply role. Set in the environment that hosts ephemeral deploys: cleanup runs from main without a GitHub Environment."
+  description = "Set in the environment that hosts ephemeral deploys. Lets the default branch assume the apply role, as cleanup runs from main without a GitHub Environment, and lets the plan role create workspace state."
   type        = bool
   default     = false
 }
