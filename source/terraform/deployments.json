@@ -1,0 +1,20 @@
+{
+  "component-name/development/deployment-name": {
+    "account_id": "<development-account-id>",
+    "plan_role_name": "<plan-role-name>",
+    "apply_role_name": "<apply-role-name>",
+    "state_bucket_name": "<development-state-bucket-name>"
+  },
+  "component-name/pre-release/deployment-name": {
+    "account_id": "<pre-release-account-id>",
+    "plan_role_name": "<plan-role-name>",
+    "apply_role_name": "<apply-role-name>",
+    "state_bucket_name": "<pre-release-state-bucket-name>"
+  },
+  "component-name/release/deployment-name": {
+    "account_id": "<release-account-id>",
+    "plan_role_name": "<plan-role-name>",
+    "apply_role_name": "<apply-role-name>",
+    "state_bucket_name": "<release-state-bucket-name>"
+  }
+}

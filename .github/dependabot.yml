@@ -1,0 +1,33 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "(GHA)"
+    reviewers:
+      - "Home-Office-Digital/<team-name>"
+    labels:
+      - "dependencies"
+  # One entry per component: Dependabot reads providers from this directory.
+  - package-ecosystem: "terraform"
+    directory: "/source/terraform/components/component-name"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "(TF)"
+    reviewers:
+      - "Home-Office-Digital/<team-name>"
+    labels:
+      - "dependencies"
+  - package-ecosystem: "terraform"
+    directory: "/source/terraform-bootstrap/components/pipeline-roles"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "(TF)"
+    reviewers:
+      - "Home-Office-Digital/<team-name>"
+    labels:
+      - "dependencies"

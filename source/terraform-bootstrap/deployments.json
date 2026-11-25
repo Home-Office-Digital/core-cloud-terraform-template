@@ -1,0 +1,20 @@
+{
+  "pipeline-roles/development/deployment-name": {
+    "account_id": "<development-account-id>",
+    "plan_role_name": "<bootstrap-plan-role-name>",
+    "apply_role_name": "<bootstrap-apply-role-name>",
+    "state_bucket_name": "<development-state-bucket-name>"
+  },
+  "pipeline-roles/pre-release/deployment-name": {
+    "account_id": "<pre-release-account-id>",
+    "plan_role_name": "<bootstrap-plan-role-name>",
+    "apply_role_name": "<bootstrap-apply-role-name>",
+    "state_bucket_name": "<pre-release-state-bucket-name>"
+  },
+  "pipeline-roles/release/deployment-name": {
+    "account_id": "<release-account-id>",
+    "plan_role_name": "<bootstrap-plan-role-name>",
+    "apply_role_name": "<bootstrap-apply-role-name>",
+    "state_bucket_name": "<release-state-bucket-name>"
+  }
+}

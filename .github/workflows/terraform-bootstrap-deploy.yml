@@ -1,0 +1,65 @@
+name: Terraform Bootstrap Deploy
+# Plans and applies source/terraform-bootstrap, which creates the plan and apply
+# roles that Terraform Deploy uses. It runs with the bootstrap roles
+# and an approval gate before apply. A merge to main deploys to development.
+# Releases don't trigger it, so deploy pre-release and release by hand before
+# publishing a product change that needs new permissions.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "source/terraform-bootstrap/**"
+  # checkov:skip=CKV_GHA_7: a deploy, not an artifact build; the inputs are the deploy's entry point, not build-output taint
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        options: [development, pre-release, release]
+      version:
+        description: "Git ref to deploy. Blank deploys the branch selected above. Outside development, main or a release tag"
+        required: false
+        type: string
+        default: ""
+      deployment:
+        description: "'all', one name, or a comma list"
+        required: false
+        type: string
+        default: all
+      plan-only:
+        description: "Plan only, no apply or gate"
+        required: false
+        type: boolean
+        default: false
+run-name: >-
+  Terraform Bootstrap Deploy (${{ github.event_name }}: ${{ github.ref_name }})
+# Least privilege for every other job; the deploy job widens only what it needs.
+permissions:
+  contents: read
+jobs:
+  deploy:
+    # Skips only in the template repository itself, which has no AWS accounts.
+    if: github.repository != 'Home-Office-Digital/core-cloud-terraform-template'
+    permissions:
+      id-token: write       # OIDC role assumption in the reusable workflow
+      contents: read        # checkout
+      actions: read         # preflight reads the target environment's protection rules
+      pull-requests: read   # required by the reusable workflow's preflight
+    uses: Home-Office-Digital/core-cloud-workflow-terraform-actions/.github/workflows/terraform-multi-env-deploy.yml@1.4.0
+    with:
+      terraform-dir: source/terraform-bootstrap
+      # Where a merge to main deploys. Use the same environment names as
+      # Terraform Deploy: the apply role trusts its GitHub Environment by name.
+      development-environment: development
+      environment: ${{ inputs.environment }}
+      deployment: ${{ inputs.deployment }}
+      # Blank falls back to the ref the run was dispatched from.
+      version: ${{ inputs.version != '' && inputs.version || github.ref_name }}
+      # No ephemeral deploys: each would create its own copy of the roles.
+      ephemeral: false
+      # inputs.* is empty on push, so give the boolean a value.
+      plan-only: ${{ inputs.plan-only || false }}
+      # Exact version: plan and apply each install Terraform, and a range could
+      # resolve to a newer release while apply waits at the gate.
+      terraform-version: "1.17.2"
